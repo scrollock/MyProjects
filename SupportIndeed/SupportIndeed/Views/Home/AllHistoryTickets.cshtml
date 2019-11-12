@@ -1,0 +1,29 @@
+﻿@model SupportIndeed.Models.History
+
+<div>
+    <h2>Исполненные обращения </h2>
+    <table style="text-align:left; border-color: black" border="1" cellpadding="20" cellspacing="20">
+        <thead>
+            <tr>
+                <th>Номер регистрации</th>
+                <th>Тема</th>
+                <th>Содержание</th>
+                <th>Время выполнения</th>
+                <th>Оператор</th>
+            </tr>
+        </thead>
+        @if (Model != null)
+        {
+            foreach (var ticket in Model.Collection)
+            {
+                <tr>
+                    <td>@ticket.id</td>
+                    <td>@ticket.Title</td>
+                    <td>@ticket.Body</td>
+                    <td>@((ticket.EndProcessing - ticket.StartProcessing).TotalMinutes) мин.</td>
+                    <td>@ticket.CurrentLewelOwner</td>
+                </tr>
+            }
+        }
+    </table>
+</div>

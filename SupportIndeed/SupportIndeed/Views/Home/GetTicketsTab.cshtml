@@ -1,0 +1,54 @@
+﻿@model SupportIndeed.Models.TicketsContainer
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div id="divid" >
+        <div class="jumbotron">
+            <h1>Тестовое приложение службы техподдержки</h1>
+        </div>
+
+        <div class="row" id="current">
+                @Html.Partial("AllTickets", Model?.CurrentContainer)
+        </div>
+
+        <div class="row" id="history">
+                @Html.Partial("AllHistoryTickets", Model?.HistoryContainer)
+        </div>
+    </div>
+
+@section scripts{
+    <script>
+        setInterval(function() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Content("~/Home/AllHistoryTickets")',
+                dataType: "html",
+                contentType: "text/html",
+                success: function (data, status) {
+                                     if (status === "success") {
+                                         $('#history').innerHTML = data;
+                                } else {
+                                    result = "Не удалось определить значение!";
+                                }           
+                }
+            });
+        }, 2000);
+
+        setInterval(function() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Content("~/Home/AllTickets")',
+                dataType: "html",
+                contentType: "text/html",
+                success: function (data, status) {
+                    if (status === "success") {
+                                        $('#current').innerHTML = data;
+                                } else {
+                                    result = "Не удалось определить значение!";
+                                }           
+                }
+            });
+        }, 2000);
+    </script>
+}
+    

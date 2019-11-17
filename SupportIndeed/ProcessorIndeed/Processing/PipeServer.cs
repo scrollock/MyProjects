@@ -31,8 +31,8 @@ namespace ProcessorIndeed.Processing
         public void InitProcessor(IStartContent startContent)
         {
             _startContent = startContent;
-            _processor = ProcessorFactory.GetProcessor();
-            _processor.SetParameters(_startContent);
+            _processor = ProcessorFactory.GetProcessor(_startContent);
+            
         }
         public void StartProcessing()
         {

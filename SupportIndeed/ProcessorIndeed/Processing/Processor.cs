@@ -3,6 +3,7 @@ using ProcessorIndeed.Models.Documents;
 using ProcessorIndeed.Models.Interfaces;
 using ProcessorIndeed.Processing.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,15 +47,7 @@ namespace ProcessorIndeed.Processing
             processingTicket.InitHistory(History);
         }
         public override bool IsStarted => mIsStarted;
-        public override void SetParameters(IStartContent startContent)
-        {
-            if (startContent == null)
-                return;
-            ProcessingTicket.RundomPeriodSecondes = startContent.TicketProcessingPeriodSecondes;
-            AwaitQueue.Td = startContent.StartDirectorOffsetMinutes;
-            AwaitQueue.Tm = startContent.StartManagerOffsetMinutes;
-            UnitsPool.Pool = startContent.Supportivision?.Positions.ToList();
-        }
+        
         public override ICollection<IPosition> GetAllPositions()
         {
             return UnitsPool.Pool.ToList();
@@ -79,16 +72,15 @@ namespace ProcessorIndeed.Processing
             {
                 mIsStarted = true;
             }
+            var tokenSource = new CancellationTokenSource();
             try
             {
-                var tokenSource = new CancellationTokenSource();
-                var ct = tokenSource.Token;
-                ct.ThrowIfCancellationRequested();
-
-                var taskProcessingTicket = StartTicketsProcessing(tokenSource, ct, ProcessingTicket.RundomPeriodSecondes * 1000, ProcessingTicketStep);
-                var taskAwaitTicketForOperator = StartTicketsProcessing(tokenSource, ct, ProcessingTicket.RundomPeriodSecondes * 1000, ProcessingAwaitTicketForOperatorStep);
-                var taskAwaitTicketForManager = StartTicketsProcessing(tokenSource, ct, AwaitQueue.Tm * 60 * 1000, ProcessingAwaitTicketForManagerStep);
-                var taskAwaitTicketForDirector = StartTicketsProcessing(tokenSource, ct, AwaitQueue.Td * 60 * 1000, ProcessingAwaitTicketForDirectorStep);
+                
+                tokenSource.Token.ThrowIfCancellationRequested();
+                var taskProcessingTicket = StartTicketsProcessing(tokenSource, ProcessingTicketStep);
+                var taskAwaitTicketForOperator = StartTicketsProcessing(tokenSource, ProcessingAwaitTicketForOperatorStep);
+                var taskAwaitTicketForManager = StartTicketsProcessing(tokenSource, ProcessingAwaitTicketForManagerStep);
+                var taskAwaitTicketForDirector = StartTicketsProcessing(tokenSource, ProcessingAwaitTicketForDirectorStep);
                 try
                 {
                     Task.WaitAll(taskProcessingTicket, taskAwaitTicketForOperator, taskAwaitTicketForManager, taskAwaitTicketForDirector);
@@ -102,11 +94,16 @@ namespace ProcessorIndeed.Processing
             }
             catch (Exception ex)
             {
-                StopProcessing(ex.Message);
+                StopProcessing(ex.Message, tokenSource.Token);
                 StartProcessing();
             }
         }
 
+        public override void StopProcessing(string message, CancellationToken ct)
+        {
+            StopProcessing(message);
+            ct.ThrowIfCancellationRequested();
+        }
         public override void StopProcessing(string message)
         {
             lock (mStartProcessingLocker)
@@ -123,24 +120,30 @@ namespace ProcessorIndeed.Processing
         /// <param name="delay"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        private Task StartTicketsProcessing(CancellationTokenSource tokenSource, CancellationToken ct, int delay, Action action)
+        private Task StartTicketsProcessing(CancellationTokenSource tokenSource, Action action)
         {
             return Task.Factory.StartNew(() =>
             {
+                var ct = tokenSource.Token;
                 ct.ThrowIfCancellationRequested();
                 System.Diagnostics.Debug.WriteLine($"Start Processing {action.Method.Name.ToString()}");
                 do
                 {
-                    //await Task.Delay(delay);
                     if (ct.IsCancellationRequested)
                     {
+                        StopProcessing($"Cancelled {action.Method.Name.ToString()}", ct);
                         ct.ThrowIfCancellationRequested();
-                        StopProcessing($"Cancelled {action.Method.Name.ToString()}");
                     }
-                    action();
-                    Thread.Sleep(delay);
+                    try
+                    {
+                        action();
+                    }
+                    catch(Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"{action.ToString()} error: {ex.Message}");
+                    }
                 } while (mIsStarted);
-                StopProcessing(action.Method.Name.ToString());
+                StopProcessing(action.Method.Name.ToString(), ct);
             },
                     tokenSource.Token,
                     TaskCreationOptions.LongRunning,
@@ -243,6 +246,7 @@ namespace ProcessorIndeed.Processing
                 disposedValue = true;
             }
         }
+       
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {

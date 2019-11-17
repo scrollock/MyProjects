@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using ProcessorIndeed.Models.Interfaces;
 using ProcessorIndeed.Processing.Interfaces;
 
@@ -19,8 +20,8 @@ namespace ProcessorIndeed.Processing
         public abstract int GetCountAwaitTickets();
         public abstract int GetCountProcessingTickets();
 
-        public abstract void SetParameters(IStartContent startContent);
         public abstract void StartProcessing();
+        public abstract void StopProcessing(string message, CancellationToken ct);
         public abstract void StopProcessing(string message);
     }
 }

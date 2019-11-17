@@ -1,11 +1,13 @@
 ﻿using ProcessorIndeed.Models.Interfaces;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace ProcessorIndeed.Processing.Interfaces
 {
     public interface IProcessor
     {
         void StartProcessing();
+        void StopProcessing(string message, CancellationToken ct);
         void StopProcessing(string message);
         IUnitSupportPool UnitsPool { get; }
         ICollection<IPosition> GetAllPositions();
@@ -17,7 +19,6 @@ namespace ProcessorIndeed.Processing.Interfaces
         int GetCountProcessingTickets();
         int GetCountAwaitTickets();
         int GetComplitedTickets();
-        void SetParameters(IStartContent startContent);
         bool IsStarted { get; }
     }
 }

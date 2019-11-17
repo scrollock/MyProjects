@@ -2,7 +2,7 @@
 using ProcessorIndeed.Models.SupportDivision;
 using ProcessorIndeed.Processing.Interfaces;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace ProcessorIndeed.Processing
@@ -11,9 +11,11 @@ namespace ProcessorIndeed.Processing
     {
         public int Tm { get; set; }
         public int Td { get; set; }
+
+       
         public AwaitQueue()
         {
-            QueueTickets = new Queue<Ticket>();
+            QueueTickets = new ConcurrentQueue<Ticket>();
         }
         public Ticket DequeueForDirector()
         {

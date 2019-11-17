@@ -1,4 +1,7 @@
-﻿using ProcessorIndeed.Processing.Interfaces;
+﻿using ProcessorIndeed.Models.Interfaces;
+using ProcessorIndeed.Processing.Interfaces;
+using System;
+using System.Linq;
 
 namespace ProcessorIndeed.Processing
 {
@@ -9,9 +12,13 @@ namespace ProcessorIndeed.Processing
         private static IAwaitQueue _awaitQueue;
         private static IUnitSupportPool _unitSupportPool;
         private static IProcessingTicket _processingTicket;
-        internal static IProcessor GetProcessor()
+        private static IStartContent _startContent;
+        internal static IProcessor GetProcessor(IStartContent startContent)
         {
-            if(_processor == null)
+            _unitSupportPool = GetUnitSupportPool();
+            _unitSupportPool.Pool = startContent.Supportivision?.Positions?.ToList();
+            _startContent = startContent;
+            if (_processor == null)
                 _processor = new Processor();
             return _processor;
         }
@@ -24,7 +31,11 @@ namespace ProcessorIndeed.Processing
         internal static IAwaitQueue GetAwaitQueue()
         {
             if (_awaitQueue == null)
+            {
                 _awaitQueue = new AwaitQueue();
+                _awaitQueue.Td = _startContent.StartDirectorOffsetMinutes;
+                _awaitQueue.Tm = _startContent.StartManagerOffsetMinutes;
+            }
             return _awaitQueue;
         }
         internal static IUnitSupportPool GetUnitSupportPool()
@@ -36,7 +47,10 @@ namespace ProcessorIndeed.Processing
         internal static IProcessingTicket GetProcessingTicket(IServiceQueue inputQueue, IAwaitQueue awaitQueue)
         {
             if (_processingTicket == null)
+            {
                 _processingTicket = new ProcessingTicket(inputQueue, awaitQueue);
+                _processingTicket.RundomPeriodSecondes = _startContent.TicketProcessingPeriodSecondes;
+            }
             return _processingTicket;
         }
     }

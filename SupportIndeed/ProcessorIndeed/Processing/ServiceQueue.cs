@@ -1,6 +1,6 @@
 ﻿using ProcessorIndeed.Models.Documents;
 using ProcessorIndeed.Processing.Interfaces;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace ProcessorIndeed.Processing
 {
@@ -8,7 +8,7 @@ namespace ProcessorIndeed.Processing
     {
         public ServiceQueue()
         {
-            QueueTickets = new Queue<Ticket>();
+            QueueTickets = new ConcurrentQueue<Ticket>();
         }
     }
 }

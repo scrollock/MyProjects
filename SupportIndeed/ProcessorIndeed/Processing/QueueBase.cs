@@ -1,6 +1,7 @@
 ﻿using ProcessorIndeed.Models.Documents;
 using ProcessorIndeed.Processing.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,8 +9,8 @@ namespace ProcessorIndeed.Processing
 {
     public abstract class QueueBase : IQueue
     {
-        public Queue<Ticket> QueueTickets { get; protected set; }
-        protected object mLock = new object();
+
+        public ConcurrentQueue<Ticket> QueueTickets { get; protected set; }
         public int CountTicket()
         {
             return QueueTickets?.Count ?? 0;
@@ -20,14 +21,11 @@ namespace ProcessorIndeed.Processing
             if (QueueTickets == null)
                 return null;
             var result = default(Ticket);
-            lock (mLock)
+            do
             {
-                do
-                {
-                    result = QueueTickets.Dequeue();
-                } while (result.OwnerPosition != null && !result.IsCanceled &&
-                         result.CurrentLewelOwner != Models.SupportDivision.LevelPositionEnum.None);
-            }
+                QueueTickets.TryDequeue(out result);
+            } while (result.OwnerPosition != null && !result.IsCanceled &&
+                     result.CurrentLewelOwner != Models.SupportDivision.LevelPositionEnum.None);
             return result;
         }
 

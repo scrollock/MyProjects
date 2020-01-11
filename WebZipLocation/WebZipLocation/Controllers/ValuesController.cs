@@ -1,39 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using ModelZipLocation;
+using Newtonsoft.Json;
+using System;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web.Http;
+using WebZipLocation.Models;
 
 namespace WebZipLocation.Controllers
 {
     public class ValuesController : ApiController
     {
-        // GET api/values
-        public IEnumerable<string> Get()
+        [Description("Text documentation post")]
+        [HttpPost]
+        public HttpResponseMessage Post([FromBody] string zipCode)
         {
-            return new string[] { "value1", "value2" };
+            if (string.IsNullOrEmpty(zipCode))
+                return new HttpResponseMessage(HttpStatusCode.NoContent);
+            var service = ObjectsFabric.CreateObject<ILocationService>();
+            var location = ObjectsFabric.CreateObject<Location>();
+            location.ZipCode = zipCode;
+            service.FillInformation(location, RequestVerb.POST);
+            var response = Request.CreateResponse(HttpStatusCode.Created, location);
+            response.Headers.Location = new Uri(Url.Link("DefaultApi", new { ZipCode = zipCode }));
+            return response;
         }
-
-        // GET api/values/5
-        public string Get(int id)
+        [Description("Text documentation get")]
+        [HttpGet]
+        public HttpResponseMessage Get(string zipCode)
         {
-            return "value";
-        }
-
-        // POST api/values
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
+            if (string.IsNullOrEmpty(zipCode))
+                return new HttpResponseMessage(HttpStatusCode.NoContent);
+            var service = ObjectsFabric.CreateObject<ILocationService>();
+            var location = ObjectsFabric.CreateObject<Location>();
+            location.ZipCode = zipCode;
+            service.FillInformation(location, RequestVerb.GET);
+            return Request.CreateResponse(HttpStatusCode.OK, location, JsonMediaTypeFormatter.DefaultMediaType);
         }
     }
 }

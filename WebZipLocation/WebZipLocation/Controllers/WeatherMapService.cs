@@ -8,7 +8,7 @@ using WebZipLocation.Models;
 
 namespace WebZipLocation.Controllers
 {
-    public class WeatherMapService : LocationService, IWeatherMapService
+    public class WeatherMapService : WebApiBaseService, IWeatherMapService
     {
         private string weatherMapUrl;
         public override void FillInformation(Location location, RequestVerb verb)

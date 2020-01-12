@@ -7,7 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebZipLocation", "WebZipLoc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingWebApi", "TestingWebApi\TestingWebApi.csproj", "{687802DF-98FB-4465-8E8B-E7B276DC320A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelZipLocation", "ModelZipLocation\ModelZipLocation.csproj", "{EDECDCEE-3750-458F-B407-0FEAD03FB29B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModelZipLocation", "ModelZipLocation\ModelZipLocation.csproj", "{EDECDCEE-3750-458F-B407-0FEAD03FB29B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5231CA56-C91F-4A70-AE71-0FDB433D2E24}"
+	ProjectSection(SolutionItems) = preProject
+		ReadMe.txt = ReadMe.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

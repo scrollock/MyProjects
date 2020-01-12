@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WebZipLocation.Controllers
+﻿namespace WebZipLocation.Controllers
 {
-    public interface IWeatherMapService : ILocationService
+    public interface IWeatherMapService : IWebApiBaseService
     {
     }
 }

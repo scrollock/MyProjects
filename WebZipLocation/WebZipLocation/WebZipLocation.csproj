@@ -160,11 +160,13 @@
     <Compile Include="Controllers\IGoogleTimeZoneService.cs" />
     <Compile Include="Controllers\ILocationService.cs" />
     <Compile Include="Controllers\IWeatherMapService.cs" />
+    <Compile Include="Controllers\IWebApiBaseService.cs" />
     <Compile Include="Controllers\LocationService.cs" />
     <Compile Include="Controllers\ObjectsFabric.cs" />
     <Compile Include="Controllers\RequestVerb.cs" />
     <Compile Include="Controllers\WeatherMapService.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\WebApiBaseService.cs" />
     <Compile Include="Controllers\ZipLocationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

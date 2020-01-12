@@ -1,9 +1,7 @@
-﻿using ModelZipLocation;
-
-namespace WebZipLocation.Controllers
+﻿namespace WebZipLocation.Controllers
 {
-    public interface ILocationService
+    public interface ILocationService : IWebApiBaseService
     {
-        void FillInformation(Location location, RequestVerb verb);
+        
     }
 }

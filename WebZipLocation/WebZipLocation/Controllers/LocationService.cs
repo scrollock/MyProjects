@@ -5,10 +5,9 @@ using WebZipLocation.Models;
 
 namespace WebZipLocation.Controllers
 {
-    public class LocationService : ILocationService
+    public class LocationService : WebApiBaseService, ILocationService
     {
-
-        public virtual void FillInformation(Location location, RequestVerb verb)
+        public override void FillInformation(Location location, RequestVerb verb)
         {
             try
             {

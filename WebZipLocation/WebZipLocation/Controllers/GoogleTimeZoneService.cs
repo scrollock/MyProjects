@@ -8,7 +8,7 @@ using WebZipLocation.Models;
 
 namespace WebZipLocation.Controllers
 {
-    public class GoogleTimeZoneService : LocationService, IGoogleTimeZoneService
+    public class GoogleTimeZoneService : WebApiBaseService, IGoogleTimeZoneService
     {
         private string url;
         private string key;

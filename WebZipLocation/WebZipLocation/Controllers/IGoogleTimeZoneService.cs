@@ -1,6 +1,6 @@
 ﻿namespace WebZipLocation.Controllers
 {
-    public interface IGoogleTimeZoneService : ILocationService
+    public interface IGoogleTimeZoneService : IWebApiBaseService
     {
     }
 }

@@ -1,0 +1,138 @@
+﻿@model ModelZipLocation.Location
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Zip location service</title>
+</head>
+<body>
+    <div>
+        <div class="jumbotron">
+            <p>
+                Your need input GoogleApiKey once time, which then  will be save in coockies
+                and input zipCode region then will click "Get location" button.
+            </p>
+            <div>
+                <label class="labelInput">GoogleApiKey:</label>
+                <input class="edit bk clrBorderInput" type="text" id="inputGoogleApiKey" name="inputGoogleApiKey" />
+            </div>
+            <div>
+                <label class="labelInput" id="zipCode">ZipCode:</label>
+                <input class="edit bk clrBorderInput" type="text" id="inputZip" name="inputZip" />
+            </div>
+            <div>
+                <label class="labelInput"></label>
+                <input class="btnInput" type="button" name="btnZip" id="btnZip" value="Get location" />
+            </div>
+            <div>
+                <label class="labelInput">Location:</label>
+                <div class="resultLine" name="result" id="result">@(Model?.FrandlyMessage)</div>
+            </div>
+        </div>
+    </div>
+    @section scripts{
+        <script>
+            $(document).ready(function () {
+                var key = getCookie('googleApiKey');
+                if (!isEmpty(key))
+                    $('#inputGoogleApiKey:text').val(key);
+            });
+
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+            }
+            function getCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0)
+                        return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+            function eraseCookie(name) {
+                document.cookie = name + '=; Max-Age=-99999999;';
+            }
+
+
+            function isEmpty(val) {
+                return (val === undefined || val == null || val.length <= 0) ? true : false;
+            }  
+            function CheckWarningBorder(elem) {
+                if (isEmpty($(elem).val())) {
+
+                    $(elem).removeClass('clrBorderInput');
+                    $(elem).addClass('warning');
+                    return false;
+                }
+                else {
+                    $(elem).removeClass('warning');
+                    $(elem).addClass('clrBorderInput');
+                    return true;
+                }
+            }
+            function ToDefaultBorder(elem) {
+                $(elem).removeClass('warning');
+                $(elem).addClass('clrBorderInput');
+            }
+            function SendRequestLocation() {
+                var zipcode = $('#inputZip:text').val();
+                var key = $("#inputGoogleApiKey:text").val();
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Content("~/api/Values")' + '/' + zipcode + '/'+ key,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    //data: '{zipCode: '+ zipcode + ', key: '+ key + '}',
+                    success: function (data, status) {
+                        if (status === "success" && data.ErrorMessage == "") {
+                            $('#result').removeClass('errorMsg');
+                            $('#result').text(data.FrandlyMessage);
+                        } else {
+                            $('#result').text(data.ErrorMessage);
+                            $('#result').addClass('errorMsg');
+                               }
+                        }
+                });
+            }
+
+            $("#btnZip").click(function () {
+                $('#result').text("");
+                var zipF = CheckWarningBorder($("#inputZip:text"));
+                var keyF = CheckWarningBorder($("#inputGoogleApiKey:text"));
+                setCookie('googleApiKey', $("#inputGoogleApiKey:text").val(), 7);
+                if (zipF && keyF) {
+                    SendRequestLocation();
+                }
+            });
+                                   
+            $("#inputZip").change(function () {
+                ToDefaultBorder($("#inputZip"))
+            });
+            $("#inputGoogleApiKey").change(function () {
+                ToDefaultBorder($("#inputGoogleApiKey"))
+            });
+            $("#inputZip").focusout(function () {
+                ToDefaultBorder($("#inputZip"))
+            });
+            $("#inputGoogleApiKey").focusout(function () {
+                ToDefaultBorder($("#inputGoogleApiKey"))
+            });
+        
+        </script>
+    }
+</body>
+</html>

@@ -6,8 +6,8 @@ namespace ModelZipLocation
 {
     public class Coord
     {
-        public double lon { get; set; }
-        public double lat { get; set; }
+        public string lon { get; set; }
+        public string lat { get; set; }
 
     }
 }

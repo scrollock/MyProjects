@@ -13,12 +13,14 @@ namespace TestingWebApi
         static HttpClient client = new HttpClient();
         private static string baseUrl;
         private static string zipCode;
+        private static string key;
         private static int port;
 
         static void Main(string[] args)
         {
             baseUrl = ConfigurationManager.AppSettings["BaseUrl"];
             zipCode = ConfigurationManager.AppSettings["ZipCode"];
+            key = ConfigurationManager.AppSettings["GoogleApiKey"];
             var portConfig = ConfigurationManager.AppSettings["Port"];
             if (args.Length > 0)
             {
@@ -31,7 +33,7 @@ namespace TestingWebApi
 
         static async Task<Location> GetLocationAsync(Location loc)
         {
-            var response = await client.GetAsync($"api/Values/{loc.ZipCode}");
+            var response = await client.GetAsync($"api/Values/{loc.ZipCode}/{loc.Key}");
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
             var result =  JsonConvert.DeserializeObject<Location>(responseBody);
@@ -49,7 +51,8 @@ namespace TestingWebApi
             Console.WriteLine($"Create a new Location in {DateTime.Now}");
             var location = new Location
             {
-                ZipCode = zipCode
+                ZipCode = zipCode,
+                Key = key
             };
             try
             {

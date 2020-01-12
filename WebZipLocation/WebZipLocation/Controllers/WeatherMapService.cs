@@ -10,10 +10,11 @@ namespace WebZipLocation.Controllers
 {
     public class WeatherMapService : LocationService, IWeatherMapService
     {
+        private string weatherMapUrl;
         public override void FillInformation(Location location, RequestVerb verb)
         {
+            weatherMapUrl = ConfigurationManager.AppSettings["WeatherMapUrl"];
             var lingual = ConfigurationManager.AppSettings["Lingual"];
-            var weatherMapUrl = ConfigurationManager.AppSettings["WeatherMapUrl"];
             var key = ConfigurationManager.AppSettings["WeatherKey"];
             if (string.IsNullOrEmpty(weatherMapUrl) || string.IsNullOrEmpty(lingual))
                 location.ErrorMessage += "Settings in config is empty" + StaticConstants.ColoneSpace;
@@ -25,7 +26,7 @@ namespace WebZipLocation.Controllers
 
         private void FillInformationGet(Location location, string url, string lingual, string key)
         {
-            var urlGet = $@"https://samples.openweathermap.org/data/2.5/weather?zip={location.ZipCode},{lingual}&appid={key}";
+            var urlGet = $@"{weatherMapUrl}?zip={location.ZipCode},{lingual}&appid={key}";
             var request = WebRequest.Create(urlGet);
             request.Method = nameof(RequestVerb.GET);
             using (var response = (HttpWebResponse)request.GetResponse())
@@ -61,10 +62,13 @@ namespace WebZipLocation.Controllers
                 {
                     string str = readStream.ReadToEnd().ToString();
                     var result = JsonConvert.DeserializeObject<WeatherLoc>(str);
-                    if (result.cod == 200)
-                        location.CurrentTemperature = (result?.main?.temp ?? 0).ToString();
+                    if (result?.cod == 200)
+                    {
+                        location.CurrentTemperature = (result.main?.temp ?? 0).ToString();
+                        location.Coord = result.coord;
+                    }
                     else
-                        location.ErrorMessage += result.message + StaticConstants.ColoneSpace;
+                        location.ErrorMessage += result?.message + StaticConstants.ColoneSpace;
                 }
             }
             catch (Exception ex)

@@ -30,8 +30,7 @@ namespace WebZipLocation
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{ZipCode}",
-                defaults: new { ZipCode = RouteParameter.Optional }
+                routeTemplate: "api/{controller}"
             );
             
         }

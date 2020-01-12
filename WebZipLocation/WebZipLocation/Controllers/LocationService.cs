@@ -1,9 +1,6 @@
 ﻿using ModelZipLocation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using WebZipLocation.Models;
 
 namespace WebZipLocation.Controllers
@@ -13,11 +10,14 @@ namespace WebZipLocation.Controllers
 
         public virtual void FillInformation(Location location, RequestVerb verb)
         {
-            var weatherMap = StartProcessing(ProcessingStartWeatherMap, location);
-            var googleTimeZone = StartProcessing(ProcessingGoogleTimeZone, location);
             try
             {
-                Task.WaitAll(weatherMap, googleTimeZone);
+                var weatherMap = StartProcessing(ProcessingStartWeatherMap, location);
+                weatherMap.Wait();
+                var googleTimeZone = StartProcessing(ProcessingGoogleTimeZone, location);
+                googleTimeZone.Wait();
+                location.FrandlyMessage = $@"At the location {location.CityName}, the temperature is {location.CurrentTemperature}, and the timezone is {location.TimeZone}";
+                //Task.WaitAll(weatherMap, googleTimeZone);
             }
             catch (AggregateException ae)
             {

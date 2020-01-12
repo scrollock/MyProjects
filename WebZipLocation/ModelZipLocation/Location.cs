@@ -12,10 +12,10 @@ namespace ModelZipLocation
         public string CurrentTemperature { get; set; }
         public string TimeZone { get; set; }
         public string ErrorMessage = string.Empty;
-        public string FrandlyMessage
-        {
-            get => $@"At the location {CityName}, the temperature is {CurrentTemperature}, and the timezone is {ZipCode}";
-        }
+        public Coord Coord { get; set; }
+        public string Key { get; set; }
+        public string FrandlyMessage { get; set; }
+        
         [NonSerialized]
         public ICollection<Exception> Exceptions = new List<Exception>();
     }
